@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# build_gdk_backend_x32.sh -- IN phorepoc-x86 (as build_gdk_x32.sh, which must have run): compile the Symbian GDK backend (hildon-symbian/os/src/gdksymbian/*.c) against the
+# build_gdk_backend_x32.sh -- IN phorepoc-x86 (as build_gdk_x32.sh, which must have run): compile the Symbian GDK backend (hildon-ui/os/src/gdksymbian/*.c) against the
 # GDK 2.24.33 core, check that no symbol is defined twice (core vs backend), and print what the core + backend still leave undefined. Out: /wk/gdk-x32/be/*.o
 set -eu
 . /glib/recipes/pins.sh; . /h/recipes/pins.sh

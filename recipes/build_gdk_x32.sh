@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # build_gdk_x32.sh -- IN phorepoc-x86 (volume at /wk, repo :ro at /repo, this repo at /h): the GDK 2.24.33 CORE (gdk/*.c outside any backend) for x32 over Open C, from the pinned
 # gtk+ tarball. No configure: gdk/ ships its generated sources (gdkenumtypes.c, gdkmarshalers.c, gdkaliasdef.c); the only missing generated file is gdkconfig.h, written here
-# for the Symbian backend (GDK_WINDOWING_SYMBIAN). The symbol aliasing of gdkalias.h is off (DISABLE_VISIBILITY). The backend (gdk/symbian, hildon-symbian/os/src/gdksymbian)
+# for the Symbian backend (GDK_WINDOWING_SYMBIAN). The symbol aliasing of gdkalias.h is off (DISABLE_VISIBILITY). The backend (gdk/symbian, hildon-ui/os/src/gdksymbian)
 # is compiled by build_gdk_backend_x32.sh. Out: /wk/gdk-x32/*.o and the list of undefined symbols the backend must provide, /wk/gdk-x32/undefined.txt
 set -eu
 . /glib/recipes/pins.sh; . /h/recipes/pins.sh

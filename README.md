@@ -11,4 +11,4 @@ Build: `REPO=<Symbian-ReverseEngineered checkout> bash recipes/build.sh [steps]`
 volume (`VOL`, default hildon-wk) as the build tree and `$REPO/.phorepoc-x86-build/hildon/` as the archive directory; the sibling repositories are mounted read-only at
 /glib /gtk /dbus in every container. Plan and findings: `docs/phorepoc/hildon-port.md` in Symbian-ReverseEngineered.
 
-Dependency graph:  glib-symbian  <-  gtk-symbian  <-  hildon-symbian  ->  dbus-symbian  ->  glib-symbian
+Dependency graph:  glib-symbian  <-  gtk-symbian  <-  hildon-ui  ->  dbus-symbian  ->  glib-symbian

@@ -1,5 +1,5 @@
 // pheglibtest.mmp -- OURS: console test EXE of the x32 GLib 2.56.4 build. The C test + GLib/GObject/GModule/GThread/libffi are
-// PREBUILT archives (hildon-symbian/recipes -> .phorepoc-x86-build/hildon/*.a), linked through the registry's x32_archives.
+// PREBUILT archives (hildon-ui/recipes -> .phorepoc-x86-build/hildon/*.a), linked through the registry's x32_archives.
 TARGET			pheglibtest.exe
 TARGETTYPE		exe
 UID				0x1000007a 0xE7015771
