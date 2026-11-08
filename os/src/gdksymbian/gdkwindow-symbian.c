@@ -394,13 +394,20 @@ impl_clear_region (GdkWindow *window, GdkRegion *region, gboolean send_expose)
   GdkWindowObject *private = GDK_WINDOW_OBJECT (window), *bgw = private; GdkWindowImplSymbian *impl = WIMPL (window); gint ox = 0, oy = 0;
   if (GDK_WINDOW_DESTROYED (window) || private->input_only) return;
   while (bgw->bg_pixmap == GDK_PARENT_RELATIVE_BG && bgw->parent && GDK_WINDOW_OBJECT (bgw->parent)->window_type != GDK_WINDOW_ROOT) { ox += bgw->x; oy += bgw->y; bgw = GDK_WINDOW_OBJECT (bgw->parent); }
-  if (bgw->bg_pixmap != GDK_NO_BG && bgw->bg_pixmap != GDK_PARENT_RELATIVE_BG) {
+  gboolean real_bg = bgw->bg_pixmap != NULL && bgw->bg_pixmap != GDK_NO_BG && bgw->bg_pixmap != GDK_PARENT_RELATIVE_BG;       /* a pixmap background */
+  if (impl->drawable.argb ? real_bg : (bgw->bg_pixmap != GDK_NO_BG && bgw->bg_pixmap != GDK_PARENT_RELATIVE_BG)) {
     cairo_t *cr = cairo_create (impl->drawable.surface); GdkRectangle box;
-    cairo_translate (cr, impl->drawable.abs_x, impl->drawable.abs_y);
+    cairo_translate (cr, SURF_X (&impl->drawable), SURF_Y (&impl->drawable));
     gdk_cairo_region (cr, region); cairo_clip (cr);
     if (bgw->bg_pixmap) { gdk_cairo_set_source_pixmap (cr, bgw->bg_pixmap, -ox, -oy); cairo_pattern_set_extend (cairo_get_source (cr), CAIRO_EXTEND_REPEAT); }
     else gdk_cairo_set_source_color (cr, &bgw->bg_color);
     cairo_paint (cr); cairo_destroy (cr);
+    gdk_region_get_clipbox (region, &box); _gdk_symbian_window_dirty (window, &box, TRUE);
+  }
+  if (impl->drawable.argb && !real_bg) {                     /* (a background colour has no alpha: on X the server fills it as a pixel of alpha 0 on a 32-bit visual)                 /* an ARGB window without a background: the cleared area is transparent (alpha 0), as the server leaves it on X */
+    cairo_t *cr = cairo_create (impl->drawable.surface); GdkRectangle box;
+    cairo_translate (cr, SURF_X (&impl->drawable), SURF_Y (&impl->drawable)); gdk_cairo_region (cr, region); cairo_clip (cr);
+    cairo_set_operator (cr, CAIRO_OPERATOR_CLEAR); cairo_paint (cr); cairo_destroy (cr);
     gdk_region_get_clipbox (region, &box); _gdk_symbian_window_dirty (window, &box, TRUE);
   }
   if (send_expose) gdk_window_invalidate_region (window, region, FALSE);
@@ -514,6 +521,7 @@ _gdk_windowing_window_process_updates_recurse (GdkWindow *window, GdkRegion *reg
   gdk_region_get_clipbox (region, &box);
   box.x += p->abs_x; box.y += p->abs_y;                      /* the region is in @window's coordinates, the dirty rectangles in those of its native window */
   if (old_active) gdk_rectangle_union (&old_box, &box, &box);
+  if (WIMPL (window)->drawable.argb) impl_clear_region (window, region, FALSE);      /* exposed area of a background-less ARGB window: transparent before the Expose */
   expose_box = box; expose_active = TRUE;
   _gdk_window_process_updates_recurse (window, region);
   expose_active = old_active; expose_box = old_box;
