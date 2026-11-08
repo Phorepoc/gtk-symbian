@@ -356,3 +356,7 @@ EXPORTS
 	cairo_ps_surface_restrict_to_level @ 355 NONAME
 	cairo_ps_surface_set_eps @ 356 NONAME
 	cairo_ps_surface_set_size @ 357 NONAME
+	cairo_image_surface_create_from_png @ 358 NONAME
+	cairo_image_surface_create_from_png_stream @ 359 NONAME
+	cairo_surface_write_to_png @ 360 NONAME
+	cairo_surface_write_to_png_stream @ 361 NONAME

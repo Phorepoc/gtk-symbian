@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # build_cairo_x32.sh -- IN phorepoc-x86 (volume at /wk, repo :ro at /repo, this repo at /h): cairo 1.16.0 (LGPL 2.1 / MPL 1.1) for x32 over Open C, image backend
-# with the FreeType font backend (cairo-ft; fontconfig, PNG, zlib off: a fixed font map replaces fontconfig). Needs build_freetype_x32.sh before. Needs build_pixman_x32.sh first (headers and the pixman objects).
+# with the FreeType font backend (cairo-ft; fontconfig, zlib off, PNG functions compiled by hand below: a fixed font map replaces fontconfig). Needs build_freetype_x32.sh before. Needs build_pixman_x32.sh first (headers and the pixman objects).
 # Same method as pixman: native configure (host) for config.h / cairo-features.h / the object list -> gen_config.py filter -> pp-gcc objects -> libphecairo.a.
 set -eu
 . /glib/recipes/pins.sh; . /h/recipes/pins.sh
@@ -22,4 +22,9 @@ FF="-I/wk/zlib-1.3.1 -I/glib/overlay -include /glib/overlay/phe_glib_compat.h -D
 o=$(make -s -C src -f Makefile -f /h/recipes/print.mk P-libcairo_la_OBJECTS)
 make -k -j${JOBS:-8} -C src CC=$CC "CFLAGS=-O2 -g0 -w -fno-pic $FF" $o > /wk/cairo-x32/objs.log 2>&1 || true
 echo "cairo: $(echo $o | wc -w) objects, errors: $(grep -ac ' error' /wk/cairo-x32/objs.log)"; grep -a ' error' /wk/cairo-x32/objs.log | sed 's/.*cairo-1.16.0.//' | cut -c1-150 | sort | uniq -c | sort -rn | head -12
+# the PNG functions (cairo_surface_write_to_png, cairo_image_surface_create_from_png ...): the object list above comes from a configure run with --disable-png; libpng is the port of this repository
+# (build_png_x32.sh / phepng.dll), so cairo-png.c is compiled here with the feature switched on (Clutter's Cogl-using code and every program that saves a surface need the real functions)
+sed -i 's|^/\*#undef CAIRO_HAS_PNG_FUNCTIONS \*/|#define CAIRO_HAS_PNG_FUNCTIONS 1|' src/cairo-features.h
+grep -q "define CAIRO_HAS_PNG_FUNCTIONS 1" src/cairo-features.h || { echo "cairo-features.h: PNG switch not found"; exit 1; }
+$CC -O2 -g0 -w -fno-pic $FF -I/wk/libpng-1.6.43 -I/wk/png-work -I . -I src -I /wk/cairo-$CAIRO_VER/src -c /wk/cairo-$CAIRO_VER/src/cairo-png.c -o src/cairo-png.o || { echo "cairo-png.c FAILED"; exit 1; }
 mkdir -p /wk/out; rm -f /wk/out/libphecairo.a; ar rcs /wk/out/libphecairo.a src/*.o; ar t /wk/out/libphecairo.a | wc -l
