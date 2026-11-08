@@ -189,6 +189,8 @@ _gdk_window_impl_new (GdkWindow *window, GdkWindow *real_parent, GdkScreen *scre
       cairo_surface_destroy (impl->drawable.surface);
       impl->drawable.surface = cairo_image_surface_create (CAIRO_FORMAT_ARGB32, impl->drawable.width, impl->drawable.height);
       impl->drawable.argb = TRUE; impl->drawable.depth = 32; private->depth = 32;
+    } else if (colormap->visual && colormap->visual->depth == 32) {     /* a native child given the RGBA colormap (an applet's child windows inherit it): the same depth as its toplevel, or GDK drops the colormap (its depth check) */
+      impl->drawable.depth = 32; private->depth = 32;
     }
     gdk_drawable_set_colormap (GDK_DRAWABLE (impl), colormap);        /* the implementation's own: the window-level call would ask for a native window (impl_window is not set until we return) */
   }
