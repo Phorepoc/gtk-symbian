@@ -60,7 +60,8 @@ gdk_display_open (const gchar *display_name)
 
   d = g_object_new (GDK_TYPE_DISPLAY_SYMBIAN, NULL);
   _gdk_display = GDK_DISPLAY_OBJECT (d);
-  d->pixels = px; d->stride = st; d->serial = 1;
+  d->front = px; d->stride = st; d->serial = 1;
+  d->pixels = g_malloc0 ((gsize) st * h);                    /* the back buffer: black, like the root window */
   s = g_object_new (GDK_TYPE_SCREEN_SYMBIAN, NULL);
   d->screen = GDK_SCREEN (s); _gdk_screen = d->screen;
   s->display = _gdk_display; s->width = w; s->height = h;
@@ -120,7 +121,7 @@ void gdk_display_beep (GdkDisplay *display) { g_return_if_fail (GDK_IS_DISPLAY (
 void gdk_display_sync (GdkDisplay *display) { g_return_if_fail (GDK_IS_DISPLAY (display)); phe_ws_sync (); }
 /* nothing is buffered on the client side except the BitBlt queue, which wakes the WSERV thread the moment a command is queued */
 void gdk_display_flush (GdkDisplay *display) { g_return_if_fail (GDK_IS_DISPLAY (display)); }
-gboolean gdk_display_supports_composite (GdkDisplay *display) { g_return_val_if_fail (GDK_IS_DISPLAY (display), FALSE); return FALSE; }
+gboolean gdk_display_supports_composite (GdkDisplay *display) { g_return_val_if_fail (GDK_IS_DISPLAY (display), FALSE); return TRUE; }      /* ARGB windows are composited by this backend */
 gboolean gdk_display_supports_cursor_alpha (GdkDisplay *display) { return FALSE; }
 gboolean gdk_display_supports_cursor_color (GdkDisplay *display) { return FALSE; }
 gboolean gdk_display_supports_input_shapes (GdkDisplay *display) { return FALSE; }
@@ -139,10 +140,10 @@ gint gdk_screen_get_height_mm (GdkScreen *screen) { g_return_val_if_fail (GDK_IS
 GdkWindow *gdk_screen_get_root_window (GdkScreen *screen) { g_return_val_if_fail (GDK_IS_SCREEN (screen), NULL); return GDK_SCREEN_SYMBIAN (screen)->root; }
 GdkColormap *gdk_screen_get_system_colormap (GdkScreen *screen) { g_return_val_if_fail (GDK_IS_SCREEN (screen), NULL); return GDK_SCREEN_SYMBIAN (screen)->colormap; }
 GdkVisual *gdk_screen_get_system_visual (GdkScreen *screen) { g_return_val_if_fail (GDK_IS_SCREEN (screen), NULL); return GDK_SCREEN_SYMBIAN (screen)->visual; }
-GdkColormap *gdk_screen_get_rgba_colormap (GdkScreen *screen) { return NULL; }      /* no ARGB visual: the bitmap is EColor16MU */
-GdkVisual *gdk_screen_get_rgba_visual (GdkScreen *screen) { return NULL; }
-gboolean gdk_screen_is_composited (GdkScreen *screen) { return FALSE; }
-GList *gdk_screen_list_visuals (GdkScreen *screen) { g_return_val_if_fail (GDK_IS_SCREEN (screen), NULL); return g_list_append (NULL, GDK_SCREEN_SYMBIAN (screen)->visual); }
+GdkColormap *gdk_screen_get_rgba_colormap (GdkScreen *screen) { g_return_val_if_fail (GDK_IS_SCREEN (screen), NULL); return GDK_SCREEN_SYMBIAN (screen)->rgba_colormap; }
+GdkVisual *gdk_screen_get_rgba_visual (GdkScreen *screen) { g_return_val_if_fail (GDK_IS_SCREEN (screen), NULL); return GDK_SCREEN_SYMBIAN (screen)->rgba_visual; }
+gboolean gdk_screen_is_composited (GdkScreen *screen) { return TRUE; }      /* windows of the RGBA colormap have per-pixel alpha, composited by the backend */
+GList *gdk_screen_list_visuals (GdkScreen *screen) { GdkScreenSymbian *s; g_return_val_if_fail (GDK_IS_SCREEN (screen), NULL); s = GDK_SCREEN_SYMBIAN (screen); return g_list_append (g_list_append (NULL, s->visual), s->rgba_visual); }
 gchar *gdk_screen_make_display_name (GdkScreen *screen) { g_return_val_if_fail (GDK_IS_SCREEN (screen), NULL); return g_strdup ("symbian:0"); }
 
 /* one monitor: the whole screen (a resolution change is `_gdk_symbian_screen_resized`) */

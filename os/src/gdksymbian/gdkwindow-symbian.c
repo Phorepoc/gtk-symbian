@@ -71,6 +71,57 @@ _gdk_symbian_window_dirty (GdkWindow *win, GdkRectangle *r, gboolean add)
   *r = d->rect; d->dirty = FALSE; return TRUE;
 }
 
+/* A screen rectangle -> the screen. Opaque windows draw into the BACK buffer; the WSERV thread shows the FRONT bitmap. The rectangle is copied back -> front and the windows with per-pixel alpha
+ * (their own ARGB surfaces, never part of the back buffer) are composited over it, bottom to top, only where no opaque window above them covers them. Nothing accumulates: the front is rebuilt
+ * from the back buffer every time, so a translucent pixel is blended exactly once. */
+void
+_gdk_symbian_present_screen (gint x, gint y, gint w, gint h)
+{
+  GdkDisplaySymbian *d = GDK_DISPLAY_SYMBIAN (_gdk_display); GList *l, *m; gint row, sw = gdk_screen_get_width (_gdk_screen), sh = gdk_screen_get_height (_gdk_screen);
+  gint x2 = MIN (x + w, sw), y2 = MIN (y + h, sh);
+  x = MAX (x, 0); y = MAX (y, 0);
+  if (x2 <= x || y2 <= y) return;
+  { static int trace = -1; if (trace < 0) trace = g_getenv ("PHEGDK_TRACE_PRESENT") != NULL;
+    if (trace) { GString *g = g_string_new (""); for (l = toplevel_stack; l; l = l->next) { GdkWindowImplSymbian *q = WIMPL (l->data); g_string_append_printf (g, " [%s%s %d,%d %dx%d]", q->drawable.argb ? "argb" : "opaque", q->mapped ? "" : " unmapped", q->drawable.abs_x, q->drawable.abs_y, q->drawable.width, q->drawable.height); }
+      { gchar *m = g_strdup_printf ("[phegdk] present_screen %d,%d %dx%d; stack:%s", x, y, x2 - x, y2 - y, g->str); phe_log (m); g_free (m); } g_string_free (g, TRUE); } }
+  for (row = y; row < y2; row++) memcpy (d->front + (gsize) row * d->stride + x * 4, d->pixels + (gsize) row * d->stride + x * 4, (x2 - x) * 4);
+  for (l = toplevel_stack; l; l = l->next) {
+    GdkWindowImplSymbian *wi = WIMPL (l->data); GdkRectangle a = { x, y, x2 - x, y2 - y }, b, i; GdkRegion *vis; GdkRectangle *rects; gint n, k; const guchar *src; gint sstride;
+    if (!wi->drawable.argb || !wi->mapped || !wi->drawable.surface) continue;
+    b.x = wi->drawable.abs_x; b.y = wi->drawable.abs_y; b.width = wi->drawable.width; b.height = wi->drawable.height;
+    if (!gdk_rectangle_intersect (&a, &b, &i)) continue;
+    vis = gdk_region_rectangle (&i);
+    for (m = l->next; m; m = m->next) {                                        /* the opaque windows above it cover it */
+      GdkWindowImplSymbian *oi = WIMPL (m->data); GdkRectangle ob, oc;
+      if (oi->drawable.argb || !oi->mapped) continue;
+      ob.x = oi->drawable.abs_x; ob.y = oi->drawable.abs_y; ob.width = oi->drawable.width; ob.height = oi->drawable.height;
+      if (gdk_rectangle_intersect (&i, &ob, &oc)) { GdkRegion *r = gdk_region_rectangle (&oc); gdk_region_subtract (vis, r); gdk_region_destroy (r); }
+    }
+    cairo_surface_flush (wi->drawable.surface);
+    src = cairo_image_surface_get_data (wi->drawable.surface); sstride = cairo_image_surface_get_stride (wi->drawable.surface);
+    gdk_region_get_rectangles (vis, &rects, &n);
+    { static int trace = -1; if (trace < 0) trace = g_getenv ("PHEGDK_TRACE_PRESENT") != NULL;
+      if (trace) { gint cnt = 0, opaque = 0, qx, qy; for (qy = 0; qy < b.height; qy++) for (qx = 0; qx < b.width; qx++) { guint32 q = *(const guint32 *) (src + (gsize) qy * sstride + (gsize) qx * 4); if (q >> 24) cnt++; if ((q >> 24) == 255) opaque++; }
+        { gchar *m = g_strdup_printf ("[phegdk] argb composite: window at %d,%d %dx%d, rect %d,%d %dx%d, %d visible rect(s), %d pixels with alpha, %d opaque", b.x, b.y, b.width, b.height, i.x, i.y, i.width, i.height, n, cnt, opaque); phe_log (m); g_free (m); } } }
+    for (k = 0; k < n && src; k++) {
+      gint py, px;
+      for (py = rects[k].y; py < rects[k].y + rects[k].height; py++) for (px = rects[k].x; px < rects[k].x + rects[k].width; px++) {
+        guint32 sp = *(const guint32 *) (src + (gsize) (py - b.y) * sstride + (gsize) (px - b.x) * 4);
+        guint32 *dp = (guint32 *) (d->front + (gsize) py * d->stride + (gsize) px * 4);
+        guint a8 = sp >> 24;
+        if (a8 == 255) *dp = sp & 0x00ffffff;
+        else if (a8) {                                                          /* premultiplied: result = source + destination * (1 - alpha) */
+          guint32 dv = *dp, ia = 255 - a8;
+          guint r = ((sp >> 16) & 255) + (((dv >> 16) & 255) * ia + 127) / 255, g = ((sp >> 8) & 255) + (((dv >> 8) & 255) * ia + 127) / 255, bl = (sp & 255) + ((dv & 255) * ia + 127) / 255;
+          *dp = (MIN (r, 255u) << 16) | (MIN (g, 255u) << 8) | MIN (bl, 255u);
+        }
+      }
+    }
+    g_free (rects); gdk_region_destroy (vis);
+  }
+  phe_ws_present (x, y, x2 - x, y2 - y);
+}
+
 /* a window-relative rectangle of a native window -> the WSERV thread */
 void
 _gdk_symbian_present (GdkWindow *window, gint x, gint y, gint width, gint height)
@@ -83,7 +134,7 @@ _gdk_symbian_present (GdkWindow *window, gint x, gint y, gint width, gint height
     static int trace = -1;
     if (trace < 0) trace = g_getenv ("PHEGDK_TRACE_PRESENT") != NULL;
     if (trace) { gchar *m = g_strdup_printf ("[phegdk] present %d,%d %dx%d", ax, ay, x2 - ax, y2 - ay); phe_log (m); g_free (m); }
-    phe_ws_present (ax, ay, x2 - ax, y2 - ay);
+    _gdk_symbian_present_screen (ax, ay, x2 - ax, y2 - ay);
   }
 }
 
@@ -133,7 +184,12 @@ _gdk_window_impl_new (GdkWindow *window, GdkWindow *real_parent, GdkScreen *scre
   if (attributes->wclass == GDK_INPUT_OUTPUT) {            /* an input-only window has no pixels, so no colormap of its own: it reports the one it inherits (gdkdrawable-symbian.c) */
     if ((attributes_mask & GDK_WA_COLORMAP) && attributes->colormap) colormap = attributes->colormap;
     else colormap = gdk_screen_get_system_colormap (_gdk_screen);
-    gdk_drawable_set_colormap (GDK_DRAWABLE (window), colormap);
+    if (private->window_type != GDK_WINDOW_CHILD && colormap->visual && colormap->visual->depth == 32) {      /* a window of the RGBA colormap: per-pixel alpha, its own ARGB surface */
+      cairo_surface_destroy (impl->drawable.surface);
+      impl->drawable.surface = cairo_image_surface_create (CAIRO_FORMAT_ARGB32, impl->drawable.width, impl->drawable.height);
+      impl->drawable.argb = TRUE; impl->drawable.depth = 32; private->depth = 32;
+    }
+    gdk_drawable_set_colormap (GDK_DRAWABLE (impl), colormap);        /* the implementation's own: the window-level call would ask for a native window (impl_window is not set until we return) */
   }
   (void) visual;
   if ((attributes_mask & GDK_WA_CURSOR) && attributes->cursor) gdk_window_set_cursor (window, attributes->cursor);
@@ -156,7 +212,7 @@ repaint_area (gint x, gint y, gint w, gint h, GdkWindow *except)
     if (l->data == except || !gdk_rectangle_intersect (&a, &b, &i)) continue;
     i.x -= b.x; i.y -= b.y; gdk_window_invalidate_rect (l->data, &i, TRUE);
   }
-  phe_ws_present (MAX (x, 0), MAX (y, 0), w, h);
+  _gdk_symbian_present_screen (MAX (x, 0), MAX (y, 0), w, h);
 }
 
 static gboolean
@@ -295,9 +351,13 @@ impl_move_resize (GdkWindow *window, gboolean with_move, gint x, gint y, gint wi
       if (impl->geometry.height_inc > 1 && h > bh) h = bh + ((h - bh) / impl->geometry.height_inc) * impl->geometry.height_inc;
     }
     private->width = impl->drawable.width = w; private->height = impl->drawable.height = h;
+    if (impl->drawable.argb && (w != ow || h != oh)) {                                   /* the content of an ARGB window is its own surface: a new size is a new, transparent surface (the core exposes it) */
+      cairo_surface_destroy (impl->drawable.surface); impl->drawable.surface = cairo_image_surface_create (CAIRO_FORMAT_ARGB32, w, h);
+    }
   }
   if (impl->mapped && toplevel && (ox != impl->drawable.abs_x || oy != impl->drawable.abs_y || ow != impl->drawable.width || oh != impl->drawable.height))
     repaint_area (ox, oy, ow, oh, window);       /* what the old rectangle covered; the core exposes the new/enlarged area of this window */
+  if (impl->mapped && impl->drawable.argb) _gdk_symbian_present_screen (impl->drawable.abs_x, impl->drawable.abs_y, impl->drawable.width, impl->drawable.height);   /* an ARGB window keeps its pixels: show it where it is now */
   if (with_move || !(width < 0 && height < 0)) {
     GdkEvent *ev = gdk_event_new (GDK_CONFIGURE);
     ev->configure.window = g_object_ref (window); ev->configure.send_event = TRUE;

@@ -26,6 +26,14 @@ _gdk_visual_init (GdkScreen *screen)
   v->blue_mask = 0x000000ff; v->blue_shift = 0; v->blue_prec = 8;
   s->visual = v; _gdk_visual = v;
   s->colormap = gdk_colormap_new (v, FALSE);
+  v = g_object_new (GDK_TYPE_VISUAL, NULL);                                   /* the ARGB visual: the same colour layout with an alpha byte on top (cairo ARGB32, premultiplied) */
+  v->type = GDK_VISUAL_TRUE_COLOR; v->depth = 32; v->byte_order = GDK_LSB_FIRST;
+  v->colormap_size = 256; v->bits_per_rgb = 8;
+  v->red_mask = 0x00ff0000; v->red_shift = 16; v->red_prec = 8;
+  v->green_mask = 0x0000ff00; v->green_shift = 8; v->green_prec = 8;
+  v->blue_mask = 0x000000ff; v->blue_shift = 0; v->blue_prec = 8;
+  s->rgba_visual = v;
+  s->rgba_colormap = gdk_colormap_new (v, FALSE);
 }
 
 GdkVisual *_gdk_visual = NULL;
@@ -34,10 +42,10 @@ GdkScreen *gdk_visual_get_screen (GdkVisual *visual) { g_return_val_if_fail (GDK
 GdkVisual *gdk_visual_get_best (void) { return _gdk_visual; }
 gint gdk_visual_get_best_depth (void) { return 24; }
 GdkVisualType gdk_visual_get_best_type (void) { return GDK_VISUAL_TRUE_COLOR; }
-GdkVisual *gdk_visual_get_best_with_depth (gint depth) { return depth == 24 ? _gdk_visual : NULL; }
+GdkVisual *gdk_visual_get_best_with_depth (gint depth) { return depth == 24 ? _gdk_visual : (depth == 32 ? GDK_SCREEN_SYMBIAN (_gdk_screen)->rgba_visual : NULL); }
 GdkVisual *gdk_visual_get_best_with_type (GdkVisualType visual_type) { return visual_type == GDK_VISUAL_TRUE_COLOR ? _gdk_visual : NULL; }
-GdkVisual *gdk_visual_get_best_with_both (gint depth, GdkVisualType visual_type) { return depth == 24 && visual_type == GDK_VISUAL_TRUE_COLOR ? _gdk_visual : NULL; }
-void gdk_query_depths (gint **depths, gint *count) { static gint d[1] = { 24 }; *count = 1; *depths = d; }
+GdkVisual *gdk_visual_get_best_with_both (gint depth, GdkVisualType visual_type) { return visual_type == GDK_VISUAL_TRUE_COLOR ? gdk_visual_get_best_with_depth (depth) : NULL; }
+void gdk_query_depths (gint **depths, gint *count) { static gint d[2] = { 24, 32 }; *count = 2; *depths = d; }
 void gdk_query_visual_types (GdkVisualType **visual_types, gint *count) { static GdkVisualType t[1] = { GDK_VISUAL_TRUE_COLOR }; *count = 1; *visual_types = t; }
 
 /* ---- GdkColormap ---- */

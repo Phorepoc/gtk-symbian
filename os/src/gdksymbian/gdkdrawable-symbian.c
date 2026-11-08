@@ -52,7 +52,7 @@ impl_surface (GdkDrawableImplSymbian *impl)
     return w;
   }
   /* a window: the rectangle of the shared bitmap surface */
-  return cairo_surface_create_for_rectangle (impl->surface, impl->abs_x, impl->abs_y, impl->width, impl->height);
+  return cairo_surface_create_for_rectangle (impl->surface, SURF_X (impl), SURF_Y (impl), impl->width, impl->height);
 }
 
 static cairo_surface_t *gdk_drawable_impl_symbian_ref_cairo_surface (GdkDrawable *d) { return impl_surface (GDK_DRAWABLE_IMPL_SYMBIAN (d)); }
@@ -105,7 +105,7 @@ gdk_drawable_impl_symbian_get_colormap (GdkDrawable *d)
   }
   return impl->wrapper && GDK_IS_WINDOW (impl->wrapper) ? gdk_screen_get_system_colormap (_gdk_screen) : NULL;
 }
-static GdkVisual *gdk_drawable_impl_symbian_get_visual (GdkDrawable *d) { return IMPL (d)->depth == 24 ? _gdk_visual : NULL; }
+static GdkVisual *gdk_drawable_impl_symbian_get_visual (GdkDrawable *d) { return IMPL (d)->depth == 24 ? _gdk_visual : (IMPL (d)->depth == 32 ? gdk_screen_get_rgba_visual (_gdk_screen) : NULL); }
 static GdkScreen *gdk_drawable_impl_symbian_get_screen (GdkDrawable *d) { (void) d; return _gdk_screen; }
 
 static GdkGC *
@@ -122,12 +122,12 @@ static GdkRegion *
 occluders (GdkDrawableImplSymbian *impl)
 {
   GList *l; GdkRegion *r = NULL; gboolean above = FALSE; GdkRectangle self;
-  if (!impl->wrapper || !GDK_IS_WINDOW (impl->wrapper) || GDK_WINDOW_OBJECT (impl->wrapper)->window_type == GDK_WINDOW_ROOT) return NULL;
+  if (!impl->wrapper || !GDK_IS_WINDOW (impl->wrapper) || GDK_WINDOW_OBJECT (impl->wrapper)->window_type == GDK_WINDOW_ROOT || impl->argb) return NULL;      /* an ARGB window draws into its own surface: nothing covers it there */
   self.x = impl->abs_x; self.y = impl->abs_y; self.width = impl->width; self.height = impl->height;
   for (l = _gdk_symbian_toplevel_stack (); l; l = l->next) {
     GdkWindow *w = l->data; GdkWindowImplSymbian *wi = (GdkWindowImplSymbian *) GDK_WINDOW_OBJECT (w)->impl; GdkRectangle b, i;
     if ((GdkDrawable *) wi == (GdkDrawable *) impl) { above = TRUE; continue; }
-    if (!above || !wi->mapped) continue;
+    if (!above || !wi->mapped || wi->drawable.argb) continue;                  /* a window with alpha does not cover what is below: the display composites it over the back buffer */
     b.x = wi->drawable.abs_x; b.y = wi->drawable.abs_y; b.width = wi->drawable.width; b.height = wi->drawable.height;
     if (!gdk_rectangle_intersect (&self, &b, &i)) continue;
     i.x -= self.x; i.y -= self.y;
@@ -181,8 +181,8 @@ raster_target (GdkDrawableImplSymbian *impl, guchar **dst, gint *stride, gint *x
   data = cairo_image_surface_get_data (impl->surface); *stride = cairo_image_surface_get_stride (impl->surface);
   sw = cairo_image_surface_get_width (impl->surface); sh = cairo_image_surface_get_height (impl->surface);
   if (!data) return FALSE;
-  *dst = data + impl->abs_y * *stride + impl->abs_x * bpp;
-  *x0 = MAX (0, -impl->abs_x); *y0 = MAX (0, -impl->abs_y); *x1 = MIN (impl->width, sw - impl->abs_x); *y1 = MIN (impl->height, sh - impl->abs_y);
+  *dst = data + SURF_Y (impl) * *stride + SURF_X (impl) * bpp;
+  *x0 = MAX (0, -SURF_X (impl)); *y0 = MAX (0, -SURF_Y (impl)); *x1 = MIN (impl->width, sw - SURF_X (impl)); *y1 = MIN (impl->height, sh - SURF_Y (impl));
   return *x1 > *x0 && *y1 > *y0;
 }
 
@@ -357,7 +357,7 @@ gdk_drawable_impl_symbian_draw_drawable_with_src (GdkDrawable *d, GdkGC *gc, Gdk
     if (!sd && GDK_IS_WINDOW (src)) {                                                /* a window source: the rectangle of the shared bitmap (the window's offset inside its native window included) */
       GdkWindowObject *sp = GDK_WINDOW_OBJECT (src); GdkDrawableImplSymbian *si = (GdkDrawableImplSymbian *) sp->impl;
       sstride = cairo_image_surface_get_stride (si->surface);
-      sd = cairo_image_surface_get_data (si->surface) + (si->abs_y + sp->abs_y) * sstride + 4 * (si->abs_x + sp->abs_x); sw_ = sp->width; sh_ = sp->height;
+      sd = cairo_image_surface_get_data (si->surface) + (SURF_Y (si) + sp->abs_y) * sstride + 4 * (SURF_X (si) + sp->abs_x); sw_ = sp->width; sh_ = sp->height;
     }
     copy_pixels (impl, gc, sd, sstride, sw_, sh_, cairo_surface_get_content (ss) == CAIRO_CONTENT_ALPHA, xsrc, ysrc, xdest, ydest, width, height);
     cairo_surface_destroy (ss); return;
@@ -415,7 +415,7 @@ gdk_drawable_impl_symbian_copy_to_image (GdkDrawable *d, GdkImage *image, gint s
   data = cairo_image_surface_get_data (s); stride = cairo_image_surface_get_stride (s);
   sw = cairo_image_surface_get_width (s); sh = cairo_image_surface_get_height (s);
   if (GDK_IS_WINDOW (impl->wrapper) && data) {                                      /* a window is a rectangle of the shared bitmap: its pixels start at its origin there */
-    data += impl->abs_y * stride + 4 * impl->abs_x; sw = impl->width; sh = impl->height;
+    data += SURF_Y (impl) * stride + 4 * SURF_X (impl); sw = impl->width; sh = impl->height;
   }
   if (data) for (y = 0; y < height; y++) for (x = 0; x < width; x++) {
     gint sx = src_x + x, sy = src_y + y; guint32 px = 0;
@@ -491,6 +491,8 @@ window_mark_dirty (GdkDrawableImplSymbian *impl, gint x, gint y, gint w, gint h)
   GdkWindowImplSymbian *wi = (GdkWindowImplSymbian *) impl; GdkWindow *win = GDK_WINDOW (impl->wrapper); GdkRectangle r, cur;
   extern gboolean _gdk_symbian_window_dirty (GdkWindow *win, GdkRectangle *r, gboolean add);
   (void) wi;
+  { static int trace = -1; if (trace < 0) trace = g_getenv ("PHEGDK_TRACE_PRESENT") != NULL;
+    if (trace) { gchar *m = g_strdup_printf ("[phegdk] dirty: window %p native size %dx%d abs %d,%d argb %d depth %d, rect %d,%d %dx%d", (void *) win, impl->width, impl->height, impl->abs_x, impl->abs_y, impl->argb, impl->depth, x, y, w, h); phe_log (m); g_free (m); } }
   r.x = MAX (0, x); r.y = MAX (0, y); r.width = MIN (impl->width, x + w) - r.x; r.height = MIN (impl->height, y + h) - r.y;
   if (r.width <= 0 || r.height <= 0) return;
   cur = r;

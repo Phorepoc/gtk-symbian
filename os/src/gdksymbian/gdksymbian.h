@@ -38,7 +38,8 @@ typedef struct _GdkScreenSymbianClass { GdkScreenClass parent_class; } GdkScreen
 struct _GdkDisplaySymbian {
   GdkDisplay parent_instance;
   GdkScreen *screen;
-  unsigned char *pixels;          /* the CFbsBitmap pixel memory every window of this display draws into (EColor16MU = 0x00RRGGBB) */
+  unsigned char *pixels;          /* the BACK buffer every opaque window of this display draws into (0x00RRGGBB, same layout as the front) */
+  unsigned char *front;           /* the CFbsBitmap pixel memory the WSERV thread shows (EColor16MU = 0x00RRGGBB): back buffer + the ARGB windows composited over it (gdkwindow-symbian.c) */
   int stride;
   GSource *event_source;
   guint32 last_event_time;
@@ -50,8 +51,10 @@ struct _GdkDisplaySymbian {
 struct _GdkScreenSymbian {
   GdkScreen parent_instance;
   GdkDisplay *display;
-  GdkVisual *visual;              /* the one visual: 24 bit TrueColor 0x00RRGGBB */
+  GdkVisual *visual;              /* the system visual: 24 bit TrueColor 0x00RRGGBB */
   GdkColormap *colormap;
+  GdkVisual *rgba_visual;         /* 32 bit TrueColor 0xAARRGGBB (premultiplied, as cairo ARGB32): windows with a colormap of this visual have per-pixel alpha */
+  GdkColormap *rgba_colormap;
   GdkWindow *root;
   gint width, height, width_mm, height_mm;
 };
@@ -94,7 +97,11 @@ typedef struct _GdkDrawableImplSymbian {
   gint view_key[4];
   gint abs_x, abs_y;              /* origin inside `surface` (windows) */
   gint width, height, depth;
+  gboolean argb;                  /* a window with per-pixel alpha: `surface` is its OWN ARGB32 surface (origin 0,0), composited over the display by _gdk_symbian_present_screen */
 } GdkDrawableImplSymbian;
+#define SURF_X(i) ((i)->argb ? 0 : (i)->abs_x)      /* the origin of a window inside its surface (the display bitmap, or its own ARGB surface) */
+#define SURF_Y(i) ((i)->argb ? 0 : (i)->abs_y)
+void _gdk_symbian_present_screen (gint x, gint y, gint w, gint h);   /* a screen rectangle: back buffer -> front, ARGB windows composited over it, then the WSERV thread */
 typedef struct { GdkDrawableClass parent_class; } GdkDrawableImplSymbianClass;
 GType gdk_drawable_impl_symbian_get_type (void);
 
