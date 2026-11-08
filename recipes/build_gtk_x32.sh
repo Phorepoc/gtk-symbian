@@ -8,6 +8,7 @@ set -eu
 . /glib/recipes/pins.sh; . /h/recipes/pins.sh
 CC=/wk/lsc/bin/pp-gcc
 cd /wk; [ -f gtk+-$GTK_VER/gtk/gtkmarshalers.c ] || tar xf /h/dl/gtk+-$GTK_VER.tar.xz gtk+-$GTK_VER/gtk gtk+-$GTK_VER/config.h.win32 gtk+-$GTK_VER/configure.ac
+bash /h/recipes/patch_leste.sh
 G=/wk/gtk+-$GTK_VER; O=/wk/gtk-x32; mkdir -p $O
 # the source list: the make variables of gtk/Makefile.am, read as make would (continuation lines, no conditionals involved for these three)
 list() { awk -v v="$1" '$0 ~ "^"v" *(\\+?=)" {on=1; sub(/^[^=]*=/,""); } on { line=$0; cont = (line ~ /\\[ \t]*$/); gsub(/\\[ \t]*$/,"",line); print line; if (!cont) on=0 }' $G/gtk/Makefile.am | tr -s ' \t' '\n\n' | grep "\.c$" || true; }

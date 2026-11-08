@@ -1,0 +1,18 @@
+// Copyright The Phorepoc Authors
+// SPDX-License-Identifier: BSD-2-Clause
+//
+// pixmap.mmp -- the GTK "pixmap" theme engine (GTK+ 2.24's modules/engines/pixbuf, LGPL-2.1+; installed as libpixmap by GTK itself) as the module GTK loads through GModule. The engine name "pixmap"
+// is what theme rc files say (engine "pixmap" { ... }). Code = prebuilt archive libpixmap.a (recipes/build_pixmap_engine_x32.sh); its exports are looked up by name through resource/gmodule/pixmap.sym.
+TARGET			pixmap.dll
+TARGETTYPE		dll
+UID				0x1000008d 0xE7015797
+CAPABILITY		all -tcb
+VENDORID		0
+EPOCALLOWDLLDATA
+EPOCHEAPSIZE	0x100000 0x4000000
+OS_LAYER_SYSTEMINCLUDE_SYMBIAN
+OS_LAYER_LIBC_SYSTEMINCLUDE
+SOURCEPATH		.
+SOURCE			pixmap_dll.c
+LIBRARY			euser.lib libc.lib libm.lib libpthread.lib pheglib.lib phegobject.lib phegmodule.lib phegthread.lib phepango.lib phecairo.lib phepixbuf.lib phegdk.lib phegtk.lib
+SMPSAFE

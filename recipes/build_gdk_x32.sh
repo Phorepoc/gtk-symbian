@@ -7,6 +7,7 @@ set -eu
 . /glib/recipes/pins.sh; . /h/recipes/pins.sh
 CC=/wk/lsc/bin/pp-gcc
 cd /wk; [ -d gtk+-$GTK_VER/gdk ] || tar xf /h/dl/gtk+-$GTK_VER.tar.xz gtk+-$GTK_VER/gdk gtk+-$GTK_VER/COPYING gtk+-$GTK_VER/gtk/gtkintl.h 2>/dev/null || tar xf /h/dl/gtk+-$GTK_VER.tar.xz gtk+-$GTK_VER/gdk
+bash /h/recipes/patch_leste.sh
 G=/wk/gtk+-$GTK_VER; mkdir -p /wk/gdk-x32
 cat > $G/gdk/gdkconfig.h <<'EOC'
 /* gdkconfig.h -- written by build_gdk_x32.sh for the Symbian backend */
