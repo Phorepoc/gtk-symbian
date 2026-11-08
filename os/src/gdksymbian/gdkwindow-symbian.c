@@ -49,6 +49,7 @@ gdk_window_impl_symbian_finalize (GObject *object)
   g_free (impl->title); g_free (impl->icon_name); if (impl->icon_pixmap) g_object_unref (impl->icon_pixmap); if (impl->icon_mask) g_object_unref (impl->icon_mask);
   g_free (impl->role); g_free (impl->startup_id); g_list_foreach (impl->icon_list, (GFunc) g_object_unref, NULL); g_list_free (impl->icon_list);
   if (impl->shape) gdk_region_destroy (impl->shape);
+  if (impl->input_shape) gdk_region_destroy (impl->input_shape);
   G_OBJECT_CLASS (gdk_window_impl_symbian_parent_class)->finalize (object);
 }
 static void gdk_window_impl_symbian_class_init (GdkWindowImplSymbianClass *c) { G_OBJECT_CLASS (c)->finalize = gdk_window_impl_symbian_finalize; }
@@ -445,7 +446,27 @@ impl_shape_combine_region (GdkWindow *window, const GdkRegion *shape, gint ox, g
   if (impl->shape) { gdk_region_destroy (impl->shape); impl->shape = NULL; }
   if (shape) { impl->shape = gdk_region_copy (shape); gdk_region_offset (impl->shape, ox, oy); }
 }
-static void impl_input_shape_combine_region (GdkWindow *window, const GdkRegion *shape, gint ox, gint oy) { (void) window; (void) shape; (void) ox; (void) oy; }
+static void
+impl_input_shape_combine_region (GdkWindow *window, const GdkRegion *shape, gint ox, gint oy)
+{
+  GdkWindowImplSymbian *impl = WIMPL (window);
+  if (impl->input_shape) { gdk_region_destroy (impl->input_shape); impl->input_shape = NULL; }
+  if (shape) { impl->input_shape = gdk_region_copy (shape); gdk_region_offset (impl->input_shape, ox, oy); }
+}
+
+/* does a pointer event at (wx, wy) of the window hit it? An explicit input shape decides; otherwise an ARGB window is hit only where it is not fully transparent (a tap on a transparent pixel goes to the window below) */
+static gboolean
+window_hit (GdkWindowImplSymbian *wi, gint wx, gint wy)
+{
+  if (wi->input_shape) return gdk_region_point_in (wi->input_shape, wx, wy);
+  if (wi->drawable.argb && wi->drawable.surface && wx >= 0 && wy >= 0 && wx < wi->drawable.width && wy < wi->drawable.height
+      && cairo_image_surface_get_width (wi->drawable.surface) > wx && cairo_image_surface_get_height (wi->drawable.surface) > wy) {
+    const guint32 *p; cairo_surface_flush (wi->drawable.surface);
+    p = (const guint32 *) (cairo_image_surface_get_data (wi->drawable.surface) + wy * cairo_image_surface_get_stride (wi->drawable.surface));
+    return (p[wx] >> 24) != 0;
+  }
+  return TRUE;
+}
 static gboolean impl_set_static_gravities (GdkWindow *window, gboolean use_static) { (void) window; (void) use_static; return FALSE; }   /* not supported: the core then does the moves itself */
 static gboolean impl_queue_antiexpose (GdkWindow *window, GdkRegion *update_area) { (void) window; (void) update_area; return FALSE; }       /* no server-side expose to avoid */
 static void impl_queue_translation (GdkWindow *window, GdkGC *gc, GdkRegion *area, gint dx, gint dy) { (void) window; (void) gc; (void) area; (void) dx; (void) dy; }   /* copies are synchronous */
@@ -501,7 +522,7 @@ void _gdk_windowing_window_beep (GdkWindow *window) { (void) window; gdk_display
 void _gdk_windowing_window_destroy_foreign (GdkWindow *window) { (void) window; }          /* there are no foreign windows */
 GdkWindow *gdk_window_foreign_new_for_display (GdkDisplay *display, GdkNativeWindow anid) { (void) display; (void) anid; return NULL; }   /* a window of another process cannot be wrapped here */
 GdkRegion *_gdk_windowing_window_get_shape (GdkWindow *window) { GdkWindowImplSymbian *impl = WIMPL (window); return impl->shape ? gdk_region_copy (impl->shape) : NULL; }
-GdkRegion *_gdk_windowing_window_get_input_shape (GdkWindow *window) { (void) window; return NULL; }
+GdkRegion *_gdk_windowing_window_get_input_shape (GdkWindow *window) { GdkWindowImplSymbian *impl = WIMPL (window); return impl->input_shape ? gdk_region_copy (impl->input_shape) : NULL; }
 
 GdkRegion *
 _gdk_windowing_get_shape_for_mask (GdkBitmap *mask)
@@ -534,7 +555,8 @@ _gdk_windowing_window_at_pointer (GdkDisplay *display, gint *win_x, gint *win_y,
   GdkDisplaySymbian *d = GDK_DISPLAY_SYMBIAN (display); GList *l; GdkWindow *found = NULL; gint rx = d->pointer_x, ry = d->pointer_y, wx = rx, wy = ry;
   for (l = g_list_last (toplevel_stack); l; l = l->prev) {                    /* topmost first */
     GdkWindowImplSymbian *wi = WIMPL (l->data);
-    if (rx >= wi->drawable.abs_x && ry >= wi->drawable.abs_y && rx < wi->drawable.abs_x + wi->drawable.width && ry < wi->drawable.abs_y + wi->drawable.height) {
+    if (rx >= wi->drawable.abs_x && ry >= wi->drawable.abs_y && rx < wi->drawable.abs_x + wi->drawable.width && ry < wi->drawable.abs_y + wi->drawable.height
+        && window_hit (wi, rx - wi->drawable.abs_x, ry - wi->drawable.abs_y)) {
       found = l->data; wx = rx - wi->drawable.abs_x; wy = ry - wi->drawable.abs_y; break;
     }
   }

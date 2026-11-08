@@ -125,6 +125,7 @@ typedef struct _GdkWindowImplSymbian {
   gboolean accept_focus, focus_on_map, override_redirect, modal, urgent, skip_taskbar, skip_pager;
   gint layer;                     /* -1 keep below, 0 normal, 1 keep above (modal and transient windows are kept above what they belong to) */
   gboolean saved_valid; gint save_x, save_y, save_w, save_h;      /* the geometry to return to from maximized / fullscreen */
+  GdkRegion *input_shape;         /* gdk_window_input_shape_combine_region: where a pointer event may hit this window (NULL = the whole rectangle) */
   GdkRegion *shape;               /* window shape set by gdk_window_shape_combine_region: kept for GdkWindow bookkeeping, WSERV windows stay rectangular */
 } GdkWindowImplSymbian;
 typedef struct { GdkDrawableImplSymbianClass parent_class; } GdkWindowImplSymbianClass;

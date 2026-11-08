@@ -124,7 +124,7 @@ void gdk_display_flush (GdkDisplay *display) { g_return_if_fail (GDK_IS_DISPLAY 
 gboolean gdk_display_supports_composite (GdkDisplay *display) { g_return_val_if_fail (GDK_IS_DISPLAY (display), FALSE); return TRUE; }      /* ARGB windows are composited by this backend */
 gboolean gdk_display_supports_cursor_alpha (GdkDisplay *display) { return FALSE; }
 gboolean gdk_display_supports_cursor_color (GdkDisplay *display) { return FALSE; }
-gboolean gdk_display_supports_input_shapes (GdkDisplay *display) { return FALSE; }
+gboolean gdk_display_supports_input_shapes (GdkDisplay *display) { return TRUE; }
 gboolean gdk_display_supports_shapes (GdkDisplay *display) { return FALSE; }
 guint gdk_display_get_default_cursor_size (GdkDisplay *display) { return 16; }
 void gdk_display_get_maximal_cursor_size (GdkDisplay *display, guint *width, guint *height) { if (width) *width = 16; if (height) *height = 16; }
