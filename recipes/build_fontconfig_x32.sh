@@ -35,7 +35,7 @@ FREETYPE_CFLAGS="-I/wk/freetype-2.13.3/include" FREETYPE_LIBS="-L/wk/ft-nat -lfr
 (cd /wk/fc-nat; make -k -j${JOBS:-8} -C fc-case; make -k -j${JOBS:-8} -C fc-lang; make -k -j${JOBS:-8} -C src) > /wk/fc-nat/nat-make.log 2>&1 || true   # native build: generates fcalias.h, fcftalias.h, the case/lang tables
 cd /wk; cp -a fc-nat fc-x32; grep -rIl '/wk/fc-nat' fc-x32 --include=Makefile --include=libtool --include=config.status 2>/dev/null | xargs -r sed -i 's|/wk/fc-nat|/wk/fc-x32|g'
 cd fc-x32
-python3 /h/recipes/gen_config.py config.h - /wk/libc_syms.txt /repo/.epoc32/include/stdapis /wk/fc-cfg | cut -c1-240
+python3 /h/recipes/gen_config.py config.h - /wk/libc_syms.txt "${STDAPIS:-/repo/.epoc32/include/stdapis}" /wk/fc-cfg | cut -c1-240
 cp /wk/fc-cfg/config.h config.h
 touch config.status; find . -name Makefile -exec touch {} +; sleep 1; touch config.h stamp-h1
 find src \( -name '*.o' -o -name '*.lo' -o -name '*.la' -o -name .libs \) -prune -exec rm -rf {} + 2>/dev/null

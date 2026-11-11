@@ -16,7 +16,7 @@ FONTCONFIG_CFLAGS="-I/wk/fontconfig-2.14.2" FONTCONFIG_LIBS="-L/wk/fc-nat/src/.l
   || { tail -20 cfg.log; exit 1; }
 cd /wk; cp -a cairo-nat cairo-x32; grep -rIl '/wk/cairo-nat' cairo-x32 --include=Makefile --include=libtool --include=config.status 2>/dev/null | xargs -r sed -i 's|/wk/cairo-nat|/wk/cairo-x32|g'
 cd /wk/cairo-x32
-python3 /h/recipes/gen_config.py config.h - /wk/libc_syms.txt /repo/.epoc32/include/stdapis /wk/cairo-cfg | cut -c1-260
+python3 /h/recipes/gen_config.py config.h - /wk/libc_syms.txt "${STDAPIS:-/repo/.epoc32/include/stdapis}" /wk/cairo-cfg | cut -c1-260
 cp /wk/cairo-cfg/config.h config.h
 touch config.status; find . -name Makefile -exec touch {} +; sleep 1; touch config.h stamp-h1 src/cairo-features.h src/cairo-supported-features.h 2>/dev/null
 find src \( -name '*.o' -o -name '*.lo' -o -name '*.la' -o -name .libs \) -prune -exec rm -rf {} + 2>/dev/null

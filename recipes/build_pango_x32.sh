@@ -25,7 +25,7 @@ PKG_CONFIG_PATH=/wk/pc PKG_CONFIG_LIBDIR=/wk/pc /wk/pango-$PANGO_VER/configure -
 (cd /wk/pango-nat; PKG_CONFIG_PATH=/wk/pc make -k -j${JOBS:-8} -C pango CFLAGS="-O0 -w" > nat-make.log 2>&1) || true
 cd /wk; cp -a pango-nat pango-x32; grep -rIl '/wk/pango-nat' pango-x32 --include=Makefile --include=libtool --include=config.status 2>/dev/null | xargs -r sed -i 's|/wk/pango-nat|/wk/pango-x32|g'
 cd pango-x32; find . -name Makefile -exec sed -i "s|-I/wk/nat/glib|-I/wk/x32/glib|g; s|-I/wk/nat/gio|-I/wk/x32/gio|g; s|-I/wk/cairo-nat/src|-I/wk/cairo-x32/src|g; s|-I/wk/pixman-nat/pixman|-I/wk/pixman-x32/pixman|g" {} +   # the Makefiles carry the NATIVE trees (native glibconfig.h has 64-bit sizes)
-python3 /h/recipes/gen_config.py config.h - /wk/libc_syms.txt /repo/.epoc32/include/stdapis /wk/pango-cfg | cut -c1-240
+python3 /h/recipes/gen_config.py config.h - /wk/libc_syms.txt "${STDAPIS:-/repo/.epoc32/include/stdapis}" /wk/pango-cfg | cut -c1-240
 cp /wk/pango-cfg/config.h config.h
 touch config.status; find . -name Makefile -exec touch {} +; sleep 1; touch config.h stamp-h1
 find pango \( -name '*.o' -o -name '*.lo' -o -name '*.la' -o -name .libs \) -prune -exec rm -rf {} + 2>/dev/null

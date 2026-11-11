@@ -14,7 +14,7 @@ rm -rf pixman-nat pixman-x32; mkdir -p pixman-nat && cd pixman-nat
   --disable-timers --disable-gtk --disable-libpng > cfg.log 2>&1
 cd /wk; cp -a pixman-nat pixman-x32; grep -rIl '/wk/pixman-nat' pixman-x32 --include=Makefile --include=libtool --include=config.status 2>/dev/null | xargs -r sed -i 's|/wk/pixman-nat|/wk/pixman-x32|g'
 cd /wk/pixman-x32
-python3 /h/recipes/gen_config.py config.h - /wk/libc_syms.txt /repo/.epoc32/include/stdapis /wk/pixman-cfg | cut -c1-200
+python3 /h/recipes/gen_config.py config.h - /wk/libc_syms.txt "${STDAPIS:-/repo/.epoc32/include/stdapis}" /wk/pixman-cfg | cut -c1-200
 cp /wk/pixman-cfg/config.h config.h
 printf '\n#ifndef PIXMAN_NO_TLS\n#define PIXMAN_NO_TLS 1\n#endif\n#undef TLS\n#define TLS\n' >> config.h
 touch config.status; find . -name Makefile -exec touch {} +; sleep 1; touch config.h stamp-h1

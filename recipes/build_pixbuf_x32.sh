@@ -16,7 +16,7 @@ gio_can_sniff=yes PKG_CONFIG_PATH=/wk/pc PKG_CONFIG_LIBDIR=/wk/pc LDFLAGS="-L/wk
 (cd /wk/pixbuf-nat; PKG_CONFIG_PATH=/wk/pc make -k -j${JOBS:-8} -C gdk-pixbuf CFLAGS="-O0 -w -I/wk/png-work -I/wk/libpng-$LIBPNG_VER -I/wk/zlib-$ZLIB_VER" > nat-make.log 2>&1) || true
 cd /wk; cp -a pixbuf-nat pixbuf-x32; grep -rIl '/wk/pixbuf-nat' pixbuf-x32 --include=Makefile --include=libtool --include=config.status 2>/dev/null | xargs -r sed -i 's|/wk/pixbuf-nat|/wk/pixbuf-x32|g'
 cd pixbuf-x32; find . -name Makefile -exec sed -i "s|-I/wk/nat/glib|-I/wk/x32/glib|g; s|-I/wk/nat/gio|-I/wk/x32/gio|g" {} +
-python3 /h/recipes/gen_config.py config.h - /wk/libc_syms.txt /repo/.epoc32/include/stdapis /wk/pixbuf-cfg | cut -c1-200
+python3 /h/recipes/gen_config.py config.h - /wk/libc_syms.txt "${STDAPIS:-/repo/.epoc32/include/stdapis}" /wk/pixbuf-cfg | cut -c1-200
 cp /wk/pixbuf-cfg/config.h config.h
 touch config.status; find . -name Makefile -exec touch {} +; sleep 1; touch config.h stamp-h1
 find gdk-pixbuf \( -name '*.o' -o -name '*.lo' -o -name '*.la' -o -name .libs \) -prune -exec rm -rf {} + 2>/dev/null
