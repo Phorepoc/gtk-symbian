@@ -59,4 +59,4 @@ GO=$(ls /wk/gdk-x32/*.o /wk/gdk-x32/be/*.o /wk/atk-x32/*.o)
 nm -u $O/*.o | grep " U " | awk '{print $2}' | sort -u > $O/und_all.txt
 nm --defined-only $O/*.o $GO | awk 'NF==3{print $3}' | sort -u > $O/def_all.txt
 comm -23 $O/und_all.txt $O/def_all.txt | grep -E "^(_?gtk_|gtk_|_?gdk_|atk_)" > $O/undefined.txt || true
-grep -v "^gdk_pixbuf\|^gdk_pixdata\|^gdk_colorspace\|^gdk_interp" $O/undefined.txt > $O/undefined-own.txt; echo "undefined gtk_/gdk_/atk_ symbols (the pixbuf ones are phepixbuf's): $(wc -l < $O/undefined-own.txt)"; head -80 $O/undefined-own.txt | tr '\n' ' '
+{ grep -v "^gdk_pixbuf\|^gdk_pixdata\|^gdk_colorspace\|^gdk_interp" $O/undefined.txt || true; } > $O/undefined-own.txt; echo "undefined gtk_/gdk_/atk_ symbols (the pixbuf ones are phepixbuf's): $(wc -l < $O/undefined-own.txt)"; head -80 $O/undefined-own.txt | tr '\n' ' '
