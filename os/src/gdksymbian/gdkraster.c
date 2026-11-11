@@ -1,3 +1,5 @@
+/* Copyright The Phorepoc Authors */
+/* SPDX-License-Identifier: BSD-2-Clause */
 /* gdkraster.c -- see gdkraster.h. BSD-2-Clause (Phorepoc). Plain C, no GLib: built by the backend and by the host unit test. */
 #include <stdint.h>
 #include <string.h>

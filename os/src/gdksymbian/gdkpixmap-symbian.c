@@ -1,3 +1,5 @@
+/* Copyright The Phorepoc Authors */
+/* SPDX-License-Identifier: BSD-2-Clause */
 /* gdkpixmap-symbian.c -- pixmaps and images of the Symbian backend. A GdkPixmap is a cairo image surface (RGB24 for 24 bit, ARGB32 for 32 bit, A8 for the 1 bit bitmaps / masks);
  * a GdkImage is client memory in the same pixel layouts. BSD-2-Clause (Phorepoc). */
 #include "config.h"

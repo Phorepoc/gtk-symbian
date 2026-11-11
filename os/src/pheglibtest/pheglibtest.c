@@ -1,3 +1,5 @@
+/* Copyright The Phorepoc Authors */
+/* SPDX-License-Identifier: BSD-2-Clause */
 /* pheglibtest.c -- console test of the x32/Open C GLib 2.56.4 build: g_print, GMainLoop + timeout, a GObject subclass with a
  * signal, a GThread, and one of GLib's own test programs (glib/tests/hash.c, run as phe_glib_test_hash). Output goes to the
  * serial log through phe_log (RDebug). Licence of this file: BSD-2-Clause. */

@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Copyright The Phorepoc Authors
+# SPDX-License-Identifier: BSD-2-Clause
 # build_gdk_x32.sh -- IN phorepoc-x86 (volume at /wk, repo :ro at /repo, this repo at /h): the GDK 2.24.33 CORE (gdk/*.c outside any backend) for x32 over Open C, from the pinned
 # gtk+ tarball. No configure: gdk/ ships its generated sources (gdkenumtypes.c, gdkmarshalers.c, gdkaliasdef.c); the only missing generated file is gdkconfig.h, written here
 # for the Symbian backend (GDK_WINDOWING_SYMBIAN). The symbol aliasing of gdkalias.h is off (DISABLE_VISIBILITY). The backend (gdk/symbian, hildon-ui/os/src/gdksymbian)

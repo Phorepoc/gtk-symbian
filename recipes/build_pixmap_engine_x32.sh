@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Copyright The Phorepoc Authors
+# SPDX-License-Identifier: BSD-2-Clause
 # build_pixmap_engine_x32.sh -- IN phorepoc-x86 (volume at /wk, this repo at /h, siblings at /glib): the GTK "pixmap" theme engine = modules/engines/pixbuf of GTK+ 2.24.33 (libpixmap.so there; LGPL-2.1+),
 # compiled from the pinned tarball as libpixmap.a -> pixmap.dll (os/src/pheengpixmap). Theme rc files (hildon-theme-alpha) use engine "pixmap" for the widgets sapwood does not draw.
 # Out: /wk/pixmap-x32/*.o, /wk/out/libpixmap.a

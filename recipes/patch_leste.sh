@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Copyright The Phorepoc Authors
+# SPDX-License-Identifier: BSD-2-Clause
 # patch_leste.sh -- IN phorepoc-x86 (volume at /wk, this repo at /h): the Maemo ("hildonize") patches of Maemo Leste's GTK+ 2 (github.com/maemo-leste/gtk, debian/patches/hildonize-*.diff, GTK 2.24.25 based, kept as files in
 # patches/leste/) applied to the GTK+ 2.24.33 tree: HildonMode, hildon_gtk_widget_set_theme_size, the touch-friendly tree view / menu / dialog / entry / text view / icon view, tap-and-hold, the
 # 'hildon-row-tapped' signal ... Two hunks do not apply to 2.24.33 as they are; patches/leste/fixup_leste.py is the same change written against it. Idempotent (marker file); the gdk and gtk

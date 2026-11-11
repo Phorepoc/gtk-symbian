@@ -1,3 +1,5 @@
+/* Copyright The Phorepoc Authors */
+/* SPDX-License-Identifier: BSD-2-Clause */
 /* gdkdnd-symbian.c -- drag and drop of the Symbian backend: the local protocol (GDK_DRAG_PROTO_LOCAL), a drag between windows of this process, carried by GDK events:
  * the source context announces the destination with GDK_DRAG_ENTER / MOTION / LEAVE / DROP_START (events to the destination window, which holds a mirror context), the destination answers
  * with gdk_drag_status (GDK_DRAG_STATUS to the source) and gdk_drop_finish (GDK_DROP_FINISHED); the data travels through the "LocalDndSelection" selection of gtkselection. Destinations are the

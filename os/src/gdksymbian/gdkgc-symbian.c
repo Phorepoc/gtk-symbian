@@ -1,3 +1,5 @@
+/* Copyright The Phorepoc Authors */
+/* SPDX-License-Identifier: BSD-2-Clause */
 /* gdkgc-symbian.c -- GdkGC of the Symbian backend. A GC is a bag of drawing attributes (colours, raster function, fill, clip, line style); there is no server object behind it, so it
  * keeps the attributes itself and _gdk_symbian_gc_apply() turns them into the state of a cairo context for the drawing primitives of gdkdrawable-symbian.c. BSD-2-Clause (Phorepoc). */
 #include "config.h"

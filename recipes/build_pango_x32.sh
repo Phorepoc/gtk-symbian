@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Copyright The Phorepoc Authors
+# SPDX-License-Identifier: BSD-2-Clause
 # build_pango_x32.sh -- IN phorepoc-x86 (volume at /wk, repo :ro at /repo, this repo at /h): Pango 1.40.14 (LGPL 2.1+, the last autotools Pango) for x32 over Open C: libpango, PangoFT2 and
 # pangocairo (fontconfig backend) in ONE archive. Needs the glib native tree (build.sh steps up to objects), harfbuzz, freetype, fontconfig, cairo recipes before.
 # The configure finds its dependencies through hand-written .pc files (/wk/pc) that point at the native/x32 build trees; the object list comes from the native Makefiles.

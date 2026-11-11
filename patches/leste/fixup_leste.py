@@ -1,3 +1,5 @@
+# Copyright The Phorepoc Authors
+# SPDX-License-Identifier: LGPL-2.1-or-later
 # fixup_leste.py TREE -- the two hunks of Leste's hildonize patches (maemo-leste/gtk, GTK 2.24.25) that do not apply to GTK 2.24.33 as they are (the code around them changed upstream
 # between 2.24.25 and 2.24.33); the same change, written against 2.24.33. Run after the hildonize-*.diff files (build_gtk_x32.sh does).
 import sys

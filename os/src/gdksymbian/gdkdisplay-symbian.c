@@ -1,3 +1,5 @@
+/* Copyright The Phorepoc Authors */
+/* SPDX-License-Identifier: BSD-2-Clause */
 /* gdkdisplay-symbian.c -- GdkDisplay / GdkScreen of the Symbian backend: one display, one screen of the WSERV screen size, one 24 bit TrueColor visual (the pixel layout of
  * the CFbsBitmap EColor16MU that every window draws into), the system colormap, the core pointer device. BSD-2-Clause (Phorepoc). */
 #include "config.h"

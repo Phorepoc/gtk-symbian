@@ -1,3 +1,5 @@
+/* Copyright The Phorepoc Authors */
+/* SPDX-License-Identifier: BSD-2-Clause */
 /* gdkfont-symbian.c -- the deprecated GdkFont API of the Symbian backend, over Pango (fontconfig + FreeType + HarfBuzz): a GdkFont is a Pango font description with its metrics; widths and extents
  * come from a PangoLayout, drawing goes through the cairo path of the drawable (gdkdrawable-symbian.c calls _gdk_symbian_font_show). Font names are Pango descriptions ("Sans 12") or X logical font
  * descriptions ("-*-sans-bold-r-normal-*-14-*-*-*-*-*-*-*": family, weight, slant and pixel size are used). Text is UTF-8; a string that is not valid UTF-8 is read as Latin-1,

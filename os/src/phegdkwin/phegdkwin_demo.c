@@ -1,3 +1,5 @@
+/* Copyright The Phorepoc Authors */
+/* SPDX-License-Identifier: BSD-2-Clause */
 /* phegdkwin_demo.c -- the gdk-symbian demo, written against the PUBLIC GDK 2.24 API only: a real GdkWindow, its expose events drawn with cairo + Pango + gdk-pixbuf, the deprecated
  * GdkGC/GdkFont drawing (XOR, opaque stipple, text) over the same window, live key and tap events, and a start-up self test of the backend pieces that have no pixels (atoms,
  * properties, selection ownership, text-property conversions, keymap, fonts, drag-and-drop registration, raster operations on a pixmap read back with gdk_drawable_get_image). BSD-2-Clause (Phorepoc). */

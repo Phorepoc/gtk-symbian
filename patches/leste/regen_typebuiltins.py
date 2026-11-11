@@ -1,3 +1,5 @@
+# Copyright The Phorepoc Authors
+# SPDX-License-Identifier: BSD-2-Clause
 # regen_typebuiltins.py TREE -- gtk/gtktypebuiltins.[ch] ship generated in the GTK tarball; the Maemo patches add enums (HildonUIMode, HildonGtkInputMode, GtkInvalidInputType, ...) that need their GTypes, so the
 # two files are generated again, as gtk/Makefile.am does: glib-mkenums (the native build of glib-symbian's tree, /wk/nat) over gtk_public_h_sources with the two templates.
 import re

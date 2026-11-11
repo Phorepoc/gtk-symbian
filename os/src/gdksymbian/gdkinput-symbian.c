@@ -1,3 +1,5 @@
+/* Copyright The Phorepoc Authors */
+/* SPDX-License-Identifier: BSD-2-Clause */
 /* gdkinput-symbian.c -- GdkDevice of the Symbian backend: the single core pointer (WSERV mouse or touch) and the default colormap bookkeeping of the screen. BSD-2-Clause (Phorepoc). */
 #include "config.h"
 #include "gdksymbian.h"

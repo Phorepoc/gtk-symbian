@@ -1,3 +1,5 @@
+/* Copyright The Phorepoc Authors */
+/* SPDX-License-Identifier: BSD-2-Clause */
 #define PANGO_ENABLE_BACKEND 1
 /* phe_pango_test.c -- HarfBuzz 15.1.0 shaping straight from the ROM font, then Pango 1.40.14 (PangoCairo over fontconfig + FreeType) laying out and drawing text into an ARGB32 cairo surface. BSD-2-Clause (Phorepoc). */
 #include <stdio.h>

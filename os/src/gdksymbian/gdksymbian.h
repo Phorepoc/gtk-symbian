@@ -1,3 +1,5 @@
+/* Copyright The Phorepoc Authors */
+/* SPDX-License-Identifier: BSD-2-Clause */
 /* gdksymbian.h -- private header of the Symbian GDK backend (gdk/symbian), a real backend for GDK 2.24.33 on WSERV, modelled on the DirectFB one
  * (single display, single screen, client-side windows drawn with cairo into one bitmap that the WSERV thread shows). BSD-2-Clause (Phorepoc).
  * The WSERV side is the C ABI of phegdkwin.cpp (phe_ws_*). */

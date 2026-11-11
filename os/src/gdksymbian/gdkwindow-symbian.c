@@ -1,3 +1,5 @@
+/* Copyright The Phorepoc Authors */
+/* SPDX-License-Identifier: BSD-2-Clause */
 /* gdkwindow-symbian.c -- windows of the Symbian backend. Only the root window and toplevels (and windows made native on request) have an implementation; every other window is
  * client-side and drawn by the GDK core into the toplevel's drawable. A native window is a rectangle of the display bitmap (the surface WSERV shows through the WSERV thread):
  * showing, hiding, moving and stacking toplevels is bookkeeping on that rectangle plus exposing what was uncovered. BSD-2-Clause (Phorepoc). */

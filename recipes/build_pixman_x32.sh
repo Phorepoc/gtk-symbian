@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Copyright The Phorepoc Authors
+# SPDX-License-Identifier: BSD-2-Clause
 # build_pixman_x32.sh -- IN phorepoc-x86 (volume at /wk, repo :ro at /repo, this repo at /h): pixman 0.42.2 (MIT) for x32 over Open C.
 # 1) native configure (host) with every SIMD/asm backend off -> config.h, pixman-version.h, the object list; 2) gen_config.py filters config.h by Open C's
 # exports (+ SIZEOF_LONG 4); no TLS (an E32 image has no ELF TLS): PIXMAN_NO_TLS -> pthread keys; 3) every object with pp-gcc -> /wk/out/libphepixman.a.

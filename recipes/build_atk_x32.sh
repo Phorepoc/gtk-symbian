@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Copyright The Phorepoc Authors
+# SPDX-License-Identifier: BSD-2-Clause
 # build_atk_x32.sh -- IN phorepoc-x86 (volume at /wk, repo :ro at /repo, this repo at /h): ATK 2.38.0 (LGPL 2+; GTK 2.24 needs >= 2.10) for x32 over Open C, from the pinned tarball.
 # ATK ships no generated files: atkversion.h (from atkversion.h.in), atkmarshal.[ch] (glib-genmarshal over atkmarshal.list) and atk-enum-types.[ch] (glib-mkenums over the
 # public headers with the two templates) are produced here exactly as the project's meson.build does, with the GLib tools of the native build (/wk/nat). Out: /wk/atk-x32/*.o, /wk/out/libpheatk.a

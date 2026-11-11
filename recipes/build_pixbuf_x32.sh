@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Copyright The Phorepoc Authors
+# SPDX-License-Identifier: BSD-2-Clause
 # build_pixbuf_x32.sh -- IN phorepoc-x86 (volume at /wk, repo :ro at /repo, this repo at /h): gdk-pixbuf 2.36.12 (LGPL 2+, the last autotools release; GTK 2.24 needs >= 2.21) for x32 over Open C,
 # with the PNG loader BUILT IN (no loader modules: --with-included-loaders=png), libpng/zlib from the zlib/png recipe. Same method as pango. Out: /wk/out/libphepixbuf.a
 set -eu

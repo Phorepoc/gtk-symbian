@@ -1,3 +1,5 @@
+/* Copyright The Phorepoc Authors */
+/* SPDX-License-Identifier: BSD-2-Clause */
 /* phe_cairo_test.c -- cairo 1.16.0 (image backend) on the x32 image: fill, stroke, a gradient, a transform and a clip into an ARGB32 surface, checked pixel by pixel. BSD-2-Clause (Phorepoc). */
 #include <cairo.h>
 #include <ft2build.h>

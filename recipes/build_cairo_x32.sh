@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Copyright The Phorepoc Authors
+# SPDX-License-Identifier: BSD-2-Clause
 # build_cairo_x32.sh -- IN phorepoc-x86 (volume at /wk, repo :ro at /repo, this repo at /h): cairo 1.16.0 (LGPL 2.1 / MPL 1.1) for x32 over Open C, image backend
 # with the FreeType font backend (cairo-ft; fontconfig, zlib off, PNG functions compiled by hand below: a fixed font map replaces fontconfig). Needs build_freetype_x32.sh before. Needs build_pixman_x32.sh first (headers and the pixman objects).
 # Same method as pixman: native configure (host) for config.h / cairo-features.h / the object list -> gen_config.py filter -> pp-gcc objects -> libphecairo.a.

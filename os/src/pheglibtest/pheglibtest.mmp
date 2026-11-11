@@ -1,3 +1,5 @@
+// Copyright The Phorepoc Authors
+// SPDX-License-Identifier: BSD-2-Clause
 // pheglibtest.mmp -- OURS: console test EXE of the x32 GLib 2.56.4 build. The C test + GLib/GObject/GModule/GThread/libffi are
 // PREBUILT archives (hildon-ui/recipes -> .phorepoc-x86-build/hildon/*.a), linked through the registry's x32_archives.
 TARGET			pheglibtest.exe

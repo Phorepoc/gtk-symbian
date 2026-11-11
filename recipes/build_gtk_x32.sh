@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Copyright The Phorepoc Authors
+# SPDX-License-Identifier: BSD-2-Clause
 # build_gtk_x32.sh -- IN phorepoc-x86 (volume at /wk, repo :ro at /repo, this repo at /h): GTK+ 2.24.33 (gtk/*.c) for x32 over Open C, from the pinned tarball, on top of the GDK of
 # build_gdk_x32.sh + build_gdk_backend_x32.sh and ATK (build_atk_x32.sh). The release tarball ships every generated source (gtkmarshal*.c, gtktypebuiltins.c, gtkbuiltincache.h, gtkversion.h);
 # the translation units are the ones gtk/Makefile.am lists as gtk_base_c_sources plus the *-stub.c ones of a backend without XEMBED (GTK's own, for backends such as DirectFB), plus the Unix

@@ -1,3 +1,5 @@
+/* Copyright The Phorepoc Authors */
+/* SPDX-License-Identifier: BSD-2-Clause */
 /* gdkwinhints-symbian.c -- the window manager facing part of the GDK window API (type hints, transients, states, decorations, geometry hints, drags) and the remaining public GDK entry points
  * that have no window-system content (devices, error traps, wide characters, spawning). There is no window manager on this system, so the backend is the window manager: it acts on every hint
  * itself, with the stacking layers and the focus choice of gdkwindow-symbian.c / gdkevents-symbian.c. BSD-2-Clause (Phorepoc). */

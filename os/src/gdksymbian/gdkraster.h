@@ -1,3 +1,5 @@
+/* Copyright The Phorepoc Authors */
+/* SPDX-License-Identifier: BSD-2-Clause */
 /* gdkraster.h -- the pixel math of the Symbian GDK backend's raster operations, free of GLib/GDK/cairo so that it can be unit-tested on the host (tests/user/gdk_raster).
  * BSD-2-Clause (Phorepoc). Function numbers are those of GdkFunction (checked with static asserts in gdkgc-symbian.c). */
 #ifndef GDKRASTER_H

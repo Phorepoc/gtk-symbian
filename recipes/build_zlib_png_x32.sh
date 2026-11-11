@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Copyright The Phorepoc Authors
+# SPDX-License-Identifier: BSD-2-Clause
 # build_zlib_png_x32.sh -- IN phorepoc-x86 (volume at /wk, this repo at /h): zlib 1.3.1 (zlib licence) and libpng 1.6.43 (libpng licence) for x32 over Open C, each from its own pinned tarball,
 # compiled file by file with pp-gcc (no SIMD; the prebuilt pnglibconf.h). Out: /wk/out/libphezlib.a, /wk/out/libphepng.a
 set -eu

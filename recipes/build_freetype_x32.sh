@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Copyright The Phorepoc Authors
+# SPDX-License-Identifier: BSD-2-Clause
 # build_freetype_x32.sh -- IN phorepoc-x86 (volume at /wk, repo :ro at /repo, this repo at /h): FreeType 2.13.3 (FTL) for x32 over Open C, from the release tarball
 # (NOT the web stack's archive). Compiled by the module list (the amalgamated src/<module>/<module>.c files + the base files), ANSI stdio ftsystem.c (no mmap on Open C),
 # no zlib/LZW (a custom ftoption.h), no PNG/HarfBuzz/Brotli. Also builds a host (native) libfreetype.a that cairo's configure links its FT feature checks against.

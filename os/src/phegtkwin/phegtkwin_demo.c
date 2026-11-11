@@ -1,3 +1,5 @@
+/* Copyright The Phorepoc Authors */
+/* SPDX-License-Identifier: BSD-2-Clause */
 /* phegtkwin_demo.c -- the GTK demo, written against the PUBLIC GTK 2.24 API only: a real GtkWindow with a box of widgets (labels with Pango markup, an entry, a check button,
  * a progress bar, buttons, a frame, a separator), signals, a timeout, and a start-up self test of the widget machinery. Runs on phegtk.dll over the Symbian GDK backend. BSD-2-Clause (Phorepoc). */
 #include <stdio.h>

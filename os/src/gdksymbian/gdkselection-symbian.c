@@ -1,3 +1,5 @@
+/* Copyright The Phorepoc Authors */
+/* SPDX-License-Identifier: BSD-2-Clause */
 /* gdkselection-symbian.c -- selections of the Symbian backend: an owner table in this process (selection atom -> owning window) and the X selection protocol carried by GDK events between
  * windows of this process: SELECTION_REQUEST to the owner, the owner answers with gdk_property_change on the requestor's "GDK_SELECTION" property and gdk_selection_send_notify, which
  * delivers SELECTION_NOTIFY to the requestor; ownership changes send SELECTION_CLEAR to the previous owner. (Other Symbian processes would need a server for it; GtkEntry/GtkTextView copy

@@ -1,3 +1,5 @@
+/* Copyright The Phorepoc Authors */
+/* SPDX-License-Identifier: BSD-2-Clause */
 /* phe_pixman_test.c -- pixman 0.42.2 on the x32 image: solid fills, an OVER composite with alpha, an image-to-image copy, a scaled copy. BSD-2-Clause (Phorepoc). */
 #include <pixman.h>
 #include <stdio.h>

@@ -1,3 +1,5 @@
+# Copyright The Phorepoc Authors
+# SPDX-License-Identifier: BSD-2-Clause
 # pins.sh -- exact upstream versions + checksums; sourced after glib-symbian pins
 PIXMAN_VER=0.42.2
 PIXMAN_SHA256=ea1480efada2fd948bc75366f7c349e1c96d3297d09a3fe62626e38e234a625e

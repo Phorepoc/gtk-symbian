@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Copyright The Phorepoc Authors
+# SPDX-License-Identifier: BSD-2-Clause
 # build_harfbuzz_x32.sh -- IN phorepoc-x86 (volume at /wk, this repo at /h): HarfBuzz 15.1.0 (MIT) for x32 over Open C, from its own release tarball, as the amalgamated src/harfbuzz.cc
 # (shaper core + OpenType layout + the AAT/Indic/... shapers + the hb-ft and hb-glib glue Pango 1.40 calls; no ICU). Needs build_cxxheaders_x32.sh (libstdc++ headers).
 # C++ without exceptions/RTTI/threads (HB_NO_MT: the face and font caches are not locked; Hildon runs one UI thread). Out: /wk/out/libphehb.a

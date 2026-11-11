@@ -1,3 +1,5 @@
+/* Copyright The Phorepoc Authors */
+/* SPDX-License-Identifier: BSD-2-Clause */
 /* gdkdrawable-symbian.c -- the drawable implementation of the Symbian backend: every drawable is a cairo surface; each GdkDrawable drawing primitive is a cairo operation with the state of
  * the GC (gdkgc-symbian.c). A window drawable is a rectangle of the display's bitmap surface; drawing into one records the rectangle as dirty and a flush (after the update cycle, or an idle
  * for drawing outside it) hands the rectangles to the WSERV thread (phe_ws_present). A pixmap owns its surface. BSD-2-Clause (Phorepoc). */

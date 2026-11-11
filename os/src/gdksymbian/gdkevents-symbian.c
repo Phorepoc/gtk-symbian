@@ -1,3 +1,5 @@
+/* Copyright The Phorepoc Authors */
+/* SPDX-License-Identifier: BSD-2-Clause */
 /* gdkevents-symbian.c -- events and keymap of the Symbian backend.
  * The WSERV thread (phegdkwin.cpp) collects key and pointer events and writes one byte per batch into a pipe; the GSource here has the pipe's read end as its poll fd, so the GLib
  * main loop sleeps until WSERV has something. _gdk_events_queue() turns the raw events into GdkEvents on the display's event queue (and lets the core route them with

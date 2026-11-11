@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Copyright The Phorepoc Authors
+# SPDX-License-Identifier: BSD-2-Clause
 # build.sh -- the drawing stack (pixman, freetype, harfbuzz, fontconfig, cairo, pango, gdk-pixbuf), ATK, GDK + the Symbian backend, GTK 2.24.33 and the booted self tests (needs glib-symbian built into the same VOL). Host side, Git Bash, Docker Desktop up.
 #
 #   REPO=<Symbian-ReverseEngineered checkout>  bash recipes/build.sh [steps]

@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Copyright The Phorepoc Authors
+# SPDX-License-Identifier: BSD-2-Clause
 # build_fontconfig_x32.sh -- IN phorepoc-x86 (volume at /wk, repo :ro at /repo, this repo at /h): expat 2.5.0 (MIT) and fontconfig 2.14.2 (MIT) for x32 over Open C, each from its own pinned
 # tarball. Pango's PangoFT2/pangocairo-fc backends are written against fontconfig, so the real fontconfig is built (not a stand-in); the "fixed ROM font map" is a fonts.conf
 # that lists only the ROM font directory (os/src/pheglibtest/data/fonts.conf, FONTCONFIG_FILE at run time). Method as pixman/cairo: native configure -> config.h filtered by gen_config.py

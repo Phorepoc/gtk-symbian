@@ -1,3 +1,5 @@
+/* Copyright The Phorepoc Authors */
+/* SPDX-License-Identifier: BSD-2-Clause */
 /* phe_pixbuf_test.c -- gdk-pixbuf 2.36.12 with the built-in PNG loader (libpng 1.6.43 + zlib 1.3.1): decode an 8x4 PNG through GdkPixbufLoader and through a GMemoryInputStream (gio), check the pixels, scale it. BSD-2-Clause (Phorepoc). */
 #include <stdio.h>
 #include <string.h>

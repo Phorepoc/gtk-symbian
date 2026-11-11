@@ -1,3 +1,5 @@
+// Copyright The Phorepoc Authors
+// SPDX-License-Identifier: BSD-2-Clause
 // pheglibmain.cpp -- Symbian side of pheglibtest: runs the C test and reports over RDebug (serial log). With "--phe-run <test>" or
 // "--GTestSubprocess" in the command line it is a CHILD of the test run (a GLib test program, or a g_test_trap_subprocess re-run).
 #include <e32std.h>

@@ -1,3 +1,5 @@
+/* Copyright The Phorepoc Authors */
+/* SPDX-License-Identifier: BSD-2-Clause */
 /* gdkcursor-symbian.c -- cursors of the Symbian backend. WSERV draws the pointer (a software cursor on the devices that have a mouse, none on a touch phone), so a GdkCursor
  * is a typed handle: it records the standard cursor type for gdk_cursor_get_cursor_type and for window cursor bookkeeping. BSD-2-Clause (Phorepoc). */
 #include "config.h"

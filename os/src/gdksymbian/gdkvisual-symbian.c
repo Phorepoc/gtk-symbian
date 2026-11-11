@@ -1,3 +1,5 @@
+/* Copyright The Phorepoc Authors */
+/* SPDX-License-Identifier: BSD-2-Clause */
 /* gdkvisual-symbian.c / colormap -- the one visual of the Symbian backend (24 bit TrueColor, 0x00RRGGBB, the pixel layout of CFbsBitmap EColor16MU = cairo RGB24) and the
  * colormap for it. A TrueColor colormap has no entries to allocate: a pixel is computed from the colour with the visual's masks. BSD-2-Clause (Phorepoc). */
 #include "config.h"
