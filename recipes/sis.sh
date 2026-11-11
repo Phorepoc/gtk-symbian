@@ -12,6 +12,7 @@ LIC=
 for f in "$REPO"/LICENSES/* "$REPO/LICENSE" "$REPO/NOTICE" "$REPO/SOURCE-OFFER.txt"; do
   LIC="$LIC --file $f=!:/resource/gtk-symbian/licences/$(basename "$f")"
 done
+# --depends UID,0.1.0 = the lower layer at version >= 0.1.0 (its first release), no upper bound: any later release satisfies it
 python3 "$PHOREPOC_PDK/tools/make_sis.py" phepixman phefreetype phehb phepng phefontconfig phecairo phepango phepixbuf pheatk phegdk phegtk pixmap --unsigned --version "${PHOREPOC_PACKAGE_VERSION:-1.0.0}" \
   --name "GTK" --vendor Phorepoc --depends 0xE7015772,0.1.0,"GLib" $LIC \
   --out "$PHOREPOC_BUILD/sis/gtk-symbian-$ARCH.sis"
