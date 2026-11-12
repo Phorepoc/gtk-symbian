@@ -365,6 +365,21 @@ gdk_drawable_impl_symbian_draw_drawable_with_src (GdkDrawable *d, GdkGC *gc, Gdk
     cairo_surface_destroy (ss); return;
   }
   if (!(cr = begin (impl, gc))) { cairo_surface_destroy (ss); return; }
+  /* A copy inside one window's pixels (gdk_window_scroll / move_region: every pannable-area and tree-view scroll copies the window onto itself, source = the
+     destination's own surface, or a window sharing its bitmap) overlaps, and pixman's result for an overlapping self-composite is undefined: scrolled content
+     came out smeared or missing (hildon-port.md 7.111). Such a source is first copied into a temporary surface of the rectangle. */
+  if (cairo_surface_get_content (ss) != CAIRO_CONTENT_ALPHA && width > 0 && height > 0
+      && (src == d || GDK_IS_WINDOW (src) || ss == cairo_get_target (cr)
+          || (cairo_surface_get_type (ss) == CAIRO_SURFACE_TYPE_IMAGE && cairo_surface_get_type (cairo_get_target (cr)) == CAIRO_SURFACE_TYPE_IMAGE
+              && cairo_image_surface_get_data (ss) && cairo_image_surface_get_data (ss) == cairo_image_surface_get_data (cairo_get_target (cr))))) {
+    cairo_surface_t *tmp = cairo_image_surface_create (cairo_surface_get_content (ss) == CAIRO_CONTENT_COLOR ? CAIRO_FORMAT_RGB24 : CAIRO_FORMAT_ARGB32, width, height);
+    cairo_t *tc = cairo_create (tmp);
+    cairo_set_operator (tc, CAIRO_OPERATOR_SOURCE);
+    cairo_set_source_surface (tc, ss, -xsrc, -ysrc); cairo_paint (tc);
+    cairo_destroy (tc);
+    cairo_surface_destroy (ss);
+    ss = tmp; xsrc = 0; ysrc = 0;
+  }
   if (gc) _gdk_symbian_gc_apply (gc, cr, FALSE);
   cairo_rectangle (cr, xdest, ydest, width, height); cairo_clip (cr);
   if (cairo_surface_get_content (ss) == CAIRO_CONTENT_ALPHA) {
