@@ -524,6 +524,9 @@ _gdk_windowing_window_process_updates_recurse (GdkWindow *window, GdkRegion *reg
   gboolean old_active = expose_active; GdkRectangle old_box = expose_box, box; GdkWindowObject *p = GDK_WINDOW_OBJECT (window);
   gdk_region_get_clipbox (region, &box);
   box.x += p->abs_x; box.y += p->abs_y;                      /* the region is in @window's coordinates, the dirty rectangles in those of its native window */
+  { static int trace = -1; if (trace < 0) trace = g_getenv ("PHEGDK_TRACE_PRESENT") != NULL;
+    if (trace) { gpointer ud = NULL; gchar *m; gdk_window_get_user_data (window, &ud);
+      m = g_strdup_printf ("[phegdk] expose: %s %p box %d,%d %dx%d (native coordinates)", ud ? G_OBJECT_TYPE_NAME (ud) : "?", (void *) window, box.x, box.y, box.width, box.height); phe_log (m); g_free (m); } }
   if (old_active) gdk_rectangle_union (&old_box, &box, &box);
   if (WIMPL (window)->drawable.argb) impl_clear_region (window, region, FALSE);      /* exposed area of a background-less ARGB window: transparent before the Expose */
   expose_box = box; expose_active = TRUE;

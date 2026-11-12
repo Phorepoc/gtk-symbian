@@ -135,6 +135,10 @@ occluders (GdkDrawableImplSymbian *impl)
     i.x -= self.x; i.y -= self.y;
     if (!r) r = gdk_region_new ();
     gdk_region_union_with_rect (r, &i);
+    { static int trace = -1; if (trace < 0) trace = g_getenv ("PHEGDK_TRACE_CLIP") != NULL;
+      if (trace) { GdkWindowObject *uo = GDK_WINDOW_OBJECT (w); gpointer ud = NULL; gchar *m; gdk_window_get_user_data (w, &ud);
+        m = g_strdup_printf ("[phegdk] occluder of %p: %s %p at %d,%d %dx%d covers %d,%d %dx%d", (void *) impl->wrapper, ud ? G_OBJECT_TYPE_NAME (ud) : "?", (void *) w, b.x, b.y, b.width, b.height, i.x, i.y, i.width, i.height);
+        (void) uo; phe_log (m); g_free (m); } }
   }
   return r;
 }
@@ -566,6 +570,8 @@ void
 _gdk_symbian_window_hooks (void)
 {
   GdkDrawableClass *wc = GDK_DRAWABLE_CLASS (g_type_class_ref (GDK_TYPE_WINDOW));
+  /* the drawing traces for an application started from the menu (no environment to set there): a marker file turns them on */
+  if (g_file_test ("c:/data/phegdk.trace", G_FILE_TEST_EXISTS)) { g_setenv ("PHEGDK_TRACE_PRESENT", "1", TRUE); g_setenv ("PHEGDK_TRACE_CLIP", "1", TRUE); }
   if (!orig_ref_cairo_surface) { orig_ref_cairo_surface = wc->ref_cairo_surface; wc->ref_cairo_surface = window_ref_cairo_surface_marking; orig_set_cairo_clip = wc->set_cairo_clip; wc->set_cairo_clip = window_set_cairo_clip_occluded; }
 }
 
