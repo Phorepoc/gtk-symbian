@@ -126,6 +126,12 @@ occluders (GdkDrawableImplSymbian *impl)
   GList *l; GdkRegion *r = NULL; gboolean above = FALSE; GdkRectangle self;
   if (!impl->wrapper || !GDK_IS_WINDOW (impl->wrapper) || GDK_WINDOW_OBJECT (impl->wrapper)->window_type == GDK_WINDOW_ROOT || impl->argb) return NULL;      /* an ARGB window draws into its own surface: nothing covers it there */
   self.x = impl->abs_x; self.y = impl->abs_y; self.width = impl->width; self.height = impl->height;
+  /* a window whose native toplevel is hidden has no pixels on the screen, as with a window server. GDK still processes an expose queued before the hide (a closed picker's
+     rows, redrawn for the selection change), and that drawing landed in the shared bitmap and stayed there (hildon-port.md 7.114). The backend's own mapped flag of the
+     native toplevel decides (the core's viewable flag is still set at that point); the whole rectangle then counts as covered. */
+  { GdkWindowObject *t = GDK_WINDOW_OBJECT (impl->wrapper);
+    while (t->parent && GDK_WINDOW_TYPE (t->parent) != GDK_WINDOW_ROOT) t = t->parent;
+    if (t->impl && !((GdkWindowImplSymbian *) t->impl)->mapped) { GdkRectangle all = { 0, 0, impl->width, impl->height }; return gdk_region_rectangle (&all); } }
   for (l = _gdk_symbian_toplevel_stack (); l; l = l->next) {
     GdkWindow *w = l->data; GdkWindowImplSymbian *wi = (GdkWindowImplSymbian *) GDK_WINDOW_OBJECT (w)->impl; GdkRectangle b, i;
     if ((GdkDrawable *) wi == (GdkDrawable *) impl) { above = TRUE; continue; }
