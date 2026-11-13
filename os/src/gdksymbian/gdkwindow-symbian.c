@@ -105,7 +105,7 @@ _gdk_symbian_present_screen (gint x, gint y, gint w, gint h)
     gdk_region_get_rectangles (vis, &rects, &n);
     { static int trace = -1; if (trace < 0) trace = g_getenv ("PHEGDK_TRACE_PRESENT") != NULL;
       if (trace) { gint cnt = 0, opaque = 0, qx, qy; for (qy = 0; qy < b.height; qy++) for (qx = 0; qx < b.width; qx++) { guint32 q = *(const guint32 *) (src + (gsize) qy * sstride + (gsize) qx * 4); if (q >> 24) cnt++; if ((q >> 24) == 255) opaque++; }
-        { gchar *m = g_strdup_printf ("[phegdk] argb composite: window at %d,%d %dx%d, rect %d,%d %dx%d, %d visible rect(s), %d pixels with alpha, %d opaque", b.x, b.y, b.width, b.height, i.x, i.y, i.width, i.height, n, cnt, opaque); phe_log (m); g_free (m); } } }
+        { gchar *m = g_strdup_printf ("[phegdk] argb composite: window at %d,%d %dx%d, rect %d,%d %dx%d, %d visible rect(s), %d pixels with alpha, %d opaque, centre alpha %u", b.x, b.y, b.width, b.height, i.x, i.y, i.width, i.height, n, cnt, opaque, (unsigned) (*(const guint32 *) (src + (gsize) (b.height / 2) * sstride + (gsize) (b.width / 2) * 4) >> 24)); phe_log (m); g_free (m); } } }
     for (k = 0; k < n && src; k++) {
       gint py, px;
       for (py = rects[k].y; py < rects[k].y + rects[k].height; py++) for (px = rects[k].x; px < rects[k].x + rects[k].width; px++) {

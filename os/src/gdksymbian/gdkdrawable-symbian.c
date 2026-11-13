@@ -399,6 +399,12 @@ gdk_drawable_impl_symbian_draw_drawable_with_src (GdkDrawable *d, GdkGC *gc, Gdk
   } else {
     cairo_set_source_surface (cr, ss, xdest - xsrc, ydest - ysrc);
     if (!gc) cairo_set_operator (cr, CAIRO_OPERATOR_SOURCE);
+    /* GDK_COPY copies pixels, alpha included (XCopyArea with GXcopy on a 32-bit visual replaces them). Into a window with per-pixel alpha, OVER blended
+       the copy onto what the window's surface already held: every re-expose of a translucent window (the double-buffer pixmap copied back at the end
+       of the paint) darkened it again (hildon-port.md 7.118/7.119). Opaque destinations are unchanged. */
+    else if (impl->argb) { GdkGCValues v; gdk_gc_get_values (gc, &v); if (v.function == GDK_COPY) cairo_set_operator (cr, CAIRO_OPERATOR_SOURCE);
+      { static int trace = -1; if (trace < 0) trace = g_getenv ("PHEGDK_TRACE_PRESENT") != NULL;
+        if (trace) { gchar *m = g_strdup_printf ("[phegdk] copy into an ARGB window %p: %d,%d %dx%d, function %d", (void *) impl->wrapper, xdest, ydest, width, height, (int) v.function); phe_log (m); g_free (m); } } }
     cairo_paint (cr);
   }
   cairo_surface_destroy (ss);
